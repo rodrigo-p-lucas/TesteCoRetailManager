@@ -4,13 +4,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using TRMDesktopUI.Helpers;
 
 namespace TRMDesktopUI.ViewModels
 {
     public class LoginViewModel : Screen
     {
+		private IAPIHelper _apiHelper;
 		private string _username;
 		private string _password;
+
+		public LoginViewModel(IAPIHelper apiHelper)
+		{
+			_apiHelper = apiHelper;
+		}
 
 		public string Username
 		{
@@ -47,9 +55,18 @@ namespace TRMDesktopUI.ViewModels
 			}
 		}
 
-		public void LogIn()
+		public async Task LogIn()
 		{
-			Console.WriteLine();
+			try
+			{
+				var result = await _apiHelper.Authenticate(_username, _password);
+				MessageBox.Show("Login realizado com sucesso!", "Login", MessageBoxButton.OK, MessageBoxImage.Information);
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show($"Erro ao logar: {ex.Message}", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+			}
+
 		}
 	}
 }
