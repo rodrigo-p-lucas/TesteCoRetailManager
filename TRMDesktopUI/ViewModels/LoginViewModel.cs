@@ -14,6 +14,7 @@ namespace TRMDesktopUI.ViewModels
 		private IAPIHelper _apiHelper;
 		private string _username;
 		private string _password;
+		private string _errorMessage;
 
 		public LoginViewModel(IAPIHelper apiHelper)
 		{
@@ -40,6 +41,24 @@ namespace TRMDesktopUI.ViewModels
 			}
 		}
 
+		public bool IsErrorVisible
+		{
+			get
+			{
+				return ErrorMessage?.Length > 0;
+			}
+		}
+
+		public string ErrorMessage
+		{
+			get { return _errorMessage; }
+			set { 
+				_errorMessage = value;
+				NotifyOfPropertyChange(() => ErrorMessage);
+				NotifyOfPropertyChange(() => IsErrorVisible);
+			}
+		}
+
 		public bool CanLogIn
 		{
 			get
@@ -59,14 +78,13 @@ namespace TRMDesktopUI.ViewModels
 		{
 			try
 			{
+				ErrorMessage = "";
 				var result = await _apiHelper.Authenticate(_username, _password);
-				MessageBox.Show("Login realizado com sucesso!", "Login", MessageBoxButton.OK, MessageBoxImage.Information);
 			}
 			catch (Exception ex)
 			{
-				MessageBox.Show($"Erro ao logar: {ex.Message}", "Erro", MessageBoxButton.OK, MessageBoxImage.Error);
+				ErrorMessage = ex.Message;
 			}
-
 		}
 	}
 }
