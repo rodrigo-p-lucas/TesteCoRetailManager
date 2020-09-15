@@ -8,7 +8,8 @@ BEGIN
         ProductName,
         [Description],
         RetailPrice,
-        QuantityInStock
+        QuantityInStock,
+        IsTaxable
     from dbo.Product
     order by ProductName;
 END
