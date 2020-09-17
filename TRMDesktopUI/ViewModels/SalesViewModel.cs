@@ -14,11 +14,13 @@ namespace TRMDesktopUI.ViewModels
     public class SalesViewModel : Screen
     {
         private IProductEndpoint _productEndpoint;
-        private readonly IConfigHelper _configHelper;
+        private ISaleEndpoint _saleEndpoint;
+        private IConfigHelper _configHelper;
 
-        public SalesViewModel(IProductEndpoint productEndpoint, IConfigHelper configHelper)
+        public SalesViewModel(IProductEndpoint productEndpoint, ISaleEndpoint saleEndpoint, IConfigHelper configHelper)
         {
             _productEndpoint = productEndpoint;
+            _saleEndpoint = saleEndpoint;
             _configHelper = configHelper;
         }
 
@@ -35,7 +37,6 @@ namespace TRMDesktopUI.ViewModels
         }
 
         private BindingList<ProductModel> _products;
-
         public BindingList<ProductModel> Products
         {
             get { return _products; }
@@ -47,7 +48,6 @@ namespace TRMDesktopUI.ViewModels
         }
 
         private BindingList<CartItemModel> _cart = new BindingList<CartItemModel>();
-
         public BindingList<CartItemModel> Cart
         {
             get { return _cart; }
@@ -59,7 +59,6 @@ namespace TRMDesktopUI.ViewModels
         }
 
         private int _itemQuantity = 1;
-
         public int ItemQuantity
         {
             get { return _itemQuantity; }
@@ -72,7 +71,6 @@ namespace TRMDesktopUI.ViewModels
         }
 
         private ProductModel _selectedProduct;
-
         public ProductModel SelectedProduct
         {
             get { return _selectedProduct; }
@@ -84,7 +82,6 @@ namespace TRMDesktopUI.ViewModels
             }
         }
 
-
         public string SubTotal
         {
             get
@@ -92,7 +89,6 @@ namespace TRMDesktopUI.ViewModels
                 return CalculateSubTotal().ToString("C");
             }
         }
-
         private decimal CalculateSubTotal()
         {
             decimal subtotal = 0;
@@ -112,7 +108,6 @@ namespace TRMDesktopUI.ViewModels
                 return CalculateTax().ToString("C");
             }
         }
-
         private decimal CalculateTax()
         {
             decimal taxAmount = 0;
@@ -148,7 +143,6 @@ namespace TRMDesktopUI.ViewModels
                 return output;
             }
         }
-
         public void AddToCart()
         {
             CartItemModel existingItem = Cart.FirstOrDefault(x => x.Product == SelectedProduct);
@@ -175,9 +169,10 @@ namespace TRMDesktopUI.ViewModels
             NotifyOfPropertyChange(() => SubTotal);
             NotifyOfPropertyChange(() => Tax);
             NotifyOfPropertyChange(() => Total);
+            NotifyOfPropertyChange(() => CanCheckOut);            
         }
 
-        public bool CanRemoveToChart
+        public bool CanRemoveToCart
         {
             get
             {
@@ -188,17 +183,42 @@ namespace TRMDesktopUI.ViewModels
                 return output;
             }
         }
-
-        public void RemoveToChart()
+        public void RemoveToCart()
         {
             NotifyOfPropertyChange(() => SubTotal);
             NotifyOfPropertyChange(() => Tax);
             NotifyOfPropertyChange(() => Total);
+            NotifyOfPropertyChange(() => CanCheckOut);
         }
 
-        public void CheckOut()
+        public bool CanCheckOut
         {
+            get
+            {
+                var output = false;
 
+                if (Cart.Any())
+                {
+                    output = true;
+                }
+
+                return output;
+            }
+        }
+        public async Task CheckOut()
+        {
+            SaleModel sale = new SaleModel();
+
+            foreach (var item in Cart)
+            {
+                sale.SaleDetails.Add(new SaleDetailModel
+                {
+                    ProductId = item.Product.Id,
+                    Quantity = item.QuantityInCart
+                });
+            }
+
+            await _saleEndpoint.PostSale(sale);
         }
     }
 }
