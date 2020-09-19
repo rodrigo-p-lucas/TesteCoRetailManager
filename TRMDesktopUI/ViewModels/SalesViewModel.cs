@@ -32,11 +32,6 @@ namespace TRMDesktopUI.ViewModels
         {
             base.OnViewLoaded(view);
             await ResetSalesViewModel();
-
-            NotifyOfPropertyChange(() => SubTotal);
-            NotifyOfPropertyChange(() => Tax);
-            NotifyOfPropertyChange(() => Total);
-            NotifyOfPropertyChange(() => CanCheckOut);
         }
 
         private async Task LoadProducts()
@@ -50,6 +45,11 @@ namespace TRMDesktopUI.ViewModels
         {
             Cart = new BindingList<CartItemDisplayModel>();
             ItemQuantity = 1;
+
+            NotifyOfPropertyChange(() => SubTotal);
+            NotifyOfPropertyChange(() => Tax);
+            NotifyOfPropertyChange(() => Total);
+            NotifyOfPropertyChange(() => CanCheckOut);
 
             await LoadProducts();
         }
