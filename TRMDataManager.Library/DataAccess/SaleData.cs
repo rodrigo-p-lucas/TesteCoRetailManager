@@ -77,5 +77,14 @@ namespace TRMDataManager.Library.DataAccess
                 }
             }
         }
+
+        public IList<SaleReportModel> GetSaleReport()
+        {
+            SqlDataAccess sql = new SqlDataAccess();
+
+            var output = sql.LoadData<SaleReportModel, dynamic>("dbo.spSale_SaleReport", new { }, "TRMData");
+
+            return output;
+        }
     }
 }
