@@ -33,6 +33,7 @@ namespace TRMDesktopUI
                 .Instance(container)
                 .Instance(ConfigureAutomapper())
                 .PerRequest<ISaleEndpoint, SaleEndpoint>()
+                .PerRequest<IUserEndpoint, UserEndpoint>()
                 .PerRequest<IProductEndpoint, ProductEndpoint>();
 
             container
