@@ -32,7 +32,7 @@ namespace TRMDataManager.Controllers
         {
             var output = new List<ApplicationUserModel>();
 
-            using(var context = new ApplicationDbContext())
+            using (var context = new ApplicationDbContext())
             {
                 var userStore = new UserStore<ApplicationUser>(context);
                 var userManager = new UserManager<ApplicationUser>(userStore);
@@ -63,9 +63,9 @@ namespace TRMDataManager.Controllers
         [HttpGet]
         [Authorize(Roles = "Admin")]
         [Route("api/User/Admin/GetAllRoles")]
-        public Dictionary<string,string> GetAllRoles()
+        public Dictionary<string, string> GetAllRoles()
         {
-            using(var context = new ApplicationDbContext())
+            using (var context = new ApplicationDbContext())
             {
                 var roles = context.Roles.ToDictionary(x => x.Id, x => x.Name);
                 return roles;
@@ -96,7 +96,10 @@ namespace TRMDataManager.Controllers
                 var userStore = new UserStore<ApplicationUser>(context);
                 var userManager = new UserManager<ApplicationUser>(userStore);
 
-                userManager.RemoveFromRole(pairing.UserId, pairing.RoleName);
+                if (!string.IsNullOrWhiteSpace(pairing.RoleName))
+                {
+                    userManager.RemoveFromRole(pairing.UserId, pairing.RoleName);
+                }
             }
         }
     }
