@@ -132,8 +132,8 @@ namespace TRMDesktopUI.ViewModels
                     _status.UpdateMessage("Fatal Error", $"Unhandling Error: {ex.Message}");
                 }
 
-                _window.ShowDialog(_status, null, settings);
-                TryClose();
+                await _window.ShowDialogAsync(_status, null, settings);
+                await TryCloseAsync();
             }
         }
 
