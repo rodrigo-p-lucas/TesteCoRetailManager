@@ -14,7 +14,8 @@ using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegiste
 
 namespace TRMApi.Controllers
 {
-    public class TokenController : Controller
+    [ApiController]
+    public class TokenController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
@@ -27,13 +28,12 @@ namespace TRMApi.Controllers
 
         [HttpPost]
         [Route("/token")]
-        private async Task<IActionResult> Create(string username, string password, string grant_type)
+        public async Task<IActionResult> Create([FromForm]string username, [FromForm]string password, string grant_type)
         {
-            var user = await _userManager.FindByEmailAsync(username);
 
-            if (await IsValidUsernameAndPassword(user, password))
+            if (await IsValidUsernameAndPassword(username, password))
             {
-                return new ObjectResult(await GenerateToken(user));
+                return new ObjectResult(await GenerateToken(username));
             }
             else
             {
@@ -41,13 +41,15 @@ namespace TRMApi.Controllers
             }
         }
 
-        private async Task<bool> IsValidUsernameAndPassword(IdentityUser user, string password)
+        private async Task<bool> IsValidUsernameAndPassword(string username, string password)
         {
+            var user = await _userManager.FindByEmailAsync(username);
             return await _userManager.CheckPasswordAsync(user, password);
         }
 
-        private async Task<dynamic> GenerateToken(IdentityUser user)
+        private async Task<dynamic> GenerateToken(string username)
         {
+            var user = await _userManager.FindByEmailAsync(username);
             var roles = from ur in _context.UserRoles
                         join r in _context.Roles on ur.RoleId equals r.Id
                         where ur.UserId == user.Id
