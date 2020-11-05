@@ -22,21 +22,20 @@ namespace TRMApi.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly UserManager<IdentityUser> _userManager;
-        private readonly IConfiguration _config;
-
-        public UserController(ApplicationDbContext context, UserManager<IdentityUser> userManager, IConfiguration config)
+        private readonly IUserData _user;
+        
+        public UserController(ApplicationDbContext context, UserManager<IdentityUser> userManager, IUserData user)
         {
             _context = context;
             _userManager = userManager;
-            _config = config;
+            _user = user;
         }
         [HttpGet]
         public UserModel GetById()
         {
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            UserData data = new UserData(_config);
-
-            return data.GetUsersById(userId).First();
+            
+            return _user.GetUsersById(userId).First();
         }
 
         [HttpGet]

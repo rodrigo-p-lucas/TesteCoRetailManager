@@ -17,21 +17,20 @@ namespace TRMApi.Controllers
     [Authorize]
     public class SaleController : ControllerBase
     {
-        private readonly IConfiguration _config;
+        private readonly ISaleData _sale;
 
-        public SaleController(IConfiguration config)
+        public SaleController(ISaleData sale)
         {
-            _config = config;
+            _sale = sale;
         }
 
         [Authorize(Roles = "Cashier")]
         [HttpPost]
         public void Post(SaleModel sale)
         {
-            SaleData data = new SaleData(_config);
             string userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            data.SaveSale(sale, userId);
+            _sale.SaveSale(sale, userId);
         }
 
         [Authorize(Roles = "Admin,Manager")]
@@ -39,8 +38,7 @@ namespace TRMApi.Controllers
         [HttpGet]
         public IList<SaleReportModel> GetSalesReport()
         {
-            SaleData data = new SaleData(_config);
-            return data.GetSaleReport();
+            return _sale.GetSaleReport();
         }
     }
 }
